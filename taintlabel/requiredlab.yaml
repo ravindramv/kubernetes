@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: tomcat
+  namespace: dev-envi-namespace
+spec:
+  replicas: 3
+  selector:
+    matchLabels: 
+      app: tomcat
+  strategy:
+    type: RollingUpdate    
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template: 
+      metadata: 
+        name: mytomcat 
+        labels: 
+          app: tomcat
+      spec:
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:    
+                - matchExpressions:
+                    - key: size
+                      operator: NotIn
+                      values:
+                        - large
+                        - small
+        containers: 
+          - name: tomcat
+            image: mskoushik007/tomcat:1.0.1
